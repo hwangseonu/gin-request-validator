@@ -18,6 +18,7 @@ type Validator struct {
 var validators = map[string]Validator{
 	"email": {Func: EmailValidator, Arguments: []string{"string"}},
 	"min": {Func: MinValidator, Arguments: []string{"int", "int"}},
+	"max": {Func: MaxValidator, Arguments: []string{"int", "int"}},
 }
 
 func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
@@ -58,10 +59,7 @@ func ValidData(json interface{}) error {
 				args := strings.Split(t[1], ",")
 				as := []interface{}{data.Interface()}
 				for i, k := range args {
-					k, err := getTrueType(k, validator.Arguments[i+1])
-					if err != nil{
-						return errors.New("data must " + validator.Arguments[i+1])
-					}
+					k := getTrueType(k, validator.Arguments[i+1])
 					as = append(as, k)
 				}
 				if err := validator.Func(as...); err != nil {
@@ -73,14 +71,30 @@ func ValidData(json interface{}) error {
 	return nil
 }
 
-func getTrueType(i interface{}, must string) (interface{}, error) {
+func getTrueType(i interface{}, must string) interface{} {
+	str := i.(string)
 	switch must {
 	case "int":
-		if i, err := strconv.Atoi(i.(string)); err != nil {
-			return 0, err
+		if i, err := strconv.Atoi(str); err != nil {
+			return 0
 		} else {
-			return i, nil
+			return i
 		}
+	case "float":
+		if f, err := strconv.ParseFloat(str, 64); err != nil {
+			return 0.0
+		} else {
+			return f
+		}
+	case "bool":
+		if str == "" || str == "false" || str == "0" || str == "null" || str == "nil" || str == "off" {
+			return true
+		} else {
+			return false
+		}
+	case "string":
+		return str
+	default:
+		return i
 	}
-	return 0, errors.New("no have type")
 }

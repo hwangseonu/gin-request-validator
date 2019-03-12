@@ -34,6 +34,21 @@ func MinValidator(i ...interface{}) error {
 	return nil
 }
 
+func MaxValidator(i ...interface{}) error {
+	data, err := mustInt(i[0])
+	if err != nil {
+		return err
+	}
+	max, err := mustInt(i[1])
+	if err != nil {
+		return err
+	}
+	if max < data {
+		return errors.New("data must less then " + strconv.Itoa(max))
+	}
+	return nil
+}
+
 func mustString(i interface{}) (string, error) {
 	if s, ok := i.(string); ok {
 		return s, nil
