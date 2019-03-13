@@ -49,6 +49,27 @@ func MaxValidator(i ...interface{}) error {
 	return nil
 }
 
+func PatternValidator(i ...interface{}) error {
+	var data, regexStr string
+	var err error
+	var r *regexp.Regexp
+
+	if data, err = mustString(i[0]); err != nil {
+		return err
+	}
+	if regexStr, err = mustString(i[1]); err != nil {
+		return err
+	}
+	if r, err = regexp.Compile(regexStr); err != nil {
+		return nil
+	}
+	if r.MatchString(data) {
+		return nil
+	} else {
+		return errors.New(data + " not matched " + regexStr)
+	}
+}
+
 func mustString(i interface{}) (string, error) {
 	if s, ok := i.(string); ok {
 		return s, nil
