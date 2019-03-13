@@ -70,6 +70,16 @@ func PatternValidator(i ...interface{}) error {
 	}
 }
 
+func NotBlackValidator(i ...interface{}) error {
+	if str, err := mustString(i); err != nil {
+		return err
+	} else if str == "" {
+		return errors.New("string should not blank")
+	} else {
+		return nil
+	}
+}
+
 func mustString(i interface{}) (string, error) {
 	if s, ok := i.(string); ok {
 		return s, nil

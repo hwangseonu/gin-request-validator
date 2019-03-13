@@ -20,6 +20,7 @@ var validators = map[string]Validator{
 	"min": {Func: MinValidator, Arguments: []string{"int", "int"}},
 	"max": {Func: MaxValidator, Arguments: []string{"int", "int"}},
 	"pattern": {Func: PatternValidator, Arguments: []string{"string", "string"}},
+	"notblank": {Func: NotBlackValidator, Arguments: []string{"string"}},
 }
 
 func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
