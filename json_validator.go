@@ -11,7 +11,7 @@ import (
 )
 
 type Validator struct {
-	Func      func(...interface{}) error
+	Func      func(name string, interfaces ...interface{}) error
 	Arguments []string
 }
 
@@ -30,12 +30,15 @@ func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		str := mapToStruct(json.(map[string]interface{}), t)
-		if err := ValidData(str); err != nil {
+		if err := ValidData(json, t); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		c.Set("json", str)
+		m, ok := json.(map[string]interface{})
+		if ok {
+			json = mapToStruct(m, t)
+		}
+		c.Set("json", json)
 		c.Next()
 	}
 }
@@ -48,7 +51,11 @@ func GetJsonData(c *gin.Context) interface{} {
 	return json
 }
 
-func ValidData(json interface{}) error {
+func ValidData(json interface{}, must reflect.Type) error {
+	m, ok := json.(map[string]interface{})
+	if ok {
+		json = mapToStruct(m, must)
+	}
 	v := reflect.ValueOf(json)
 	t := reflect.TypeOf(json)
 
@@ -60,10 +67,10 @@ func ValidData(json interface{}) error {
 			data := v.Field(i)
 			validator := validators[t[0]]
 			if data.Kind().String() != validator.Arguments[0] {
-				return errors.New("data1 is must " + validator.Arguments[0])
+				return errors.New(f.Name + " must " + validator.Arguments[0])
 			}
 			if len(validator.Arguments) == 1 {
-				if err := validator.Func(data.Interface()); err != nil {
+				if err := validator.Func(f.Name, data.Interface()); err != nil {
 					return err
 				}
 			} else {
@@ -73,7 +80,7 @@ func ValidData(json interface{}) error {
 					k := getTrueType(k, validator.Arguments[i+1])
 					as = append(as, k)
 				}
-				if err := validator.Func(as...); err != nil {
+				if err := validator.Func(f.Name, as...); err != nil {
 					return err
 				}
 			}

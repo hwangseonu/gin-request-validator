@@ -8,7 +8,7 @@ import (
 
 var emailRegex = regexp.MustCompile(`^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$`)
 
-func EmailValidator(i ...interface{}) error {
+func EmailValidator(name string, i ...interface{}) error {
 	str, err := mustString(i[0])
 	if err != nil {
 		return err
@@ -19,7 +19,7 @@ func EmailValidator(i ...interface{}) error {
 	return nil
 }
 
-func MinValidator(i ...interface{}) error {
+func MinValidator(name string, i ...interface{}) error {
 	data, err := mustInt(i[0])
 	if err != nil {
 		return err
@@ -29,12 +29,12 @@ func MinValidator(i ...interface{}) error {
 		return err
 	}
 	if min > data {
-		return errors.New("data must great then " + strconv.Itoa(min))
+		return errors.New(name + " must greater than " + strconv.Itoa(min) + ", but actual value is " + strconv.Itoa(data))
 	}
 	return nil
 }
 
-func MaxValidator(i ...interface{}) error {
+func MaxValidator(name string, i ...interface{}) error {
 	data, err := mustInt(i[0])
 	if err != nil {
 		return err
@@ -44,12 +44,12 @@ func MaxValidator(i ...interface{}) error {
 		return err
 	}
 	if max < data {
-		return errors.New("data must less then " + strconv.Itoa(max))
+		return errors.New(name + " must less than " + strconv.Itoa(max) + ", but actual value is " + strconv.Itoa(data))
 	}
 	return nil
 }
 
-func PatternValidator(i ...interface{}) error {
+func PatternValidator(name string, i ...interface{}) error {
 	var data, regexStr string
 	var err error
 	var r *regexp.Regexp
@@ -66,15 +66,15 @@ func PatternValidator(i ...interface{}) error {
 	if r.MatchString(data) {
 		return nil
 	} else {
-		return errors.New(data + " not matched " + regexStr)
+		return errors.New(name + "is not matched pattern")
 	}
 }
 
-func NotBlackValidator(i ...interface{}) error {
+func NotBlackValidator(name string, i ...interface{}) error {
 	if str, err := mustString(i); err != nil {
 		return err
 	} else if str == "" {
-		return errors.New("string should not blank")
+		return errors.New(name + " should not blank")
 	} else {
 		return nil
 	}
