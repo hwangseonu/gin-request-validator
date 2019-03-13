@@ -8,9 +8,10 @@ import (
 )
 
 type Data struct {
-	Email string `json:"email" validate:"email"`
+	Email string `json:"email" validate:"pattern=^[A-Z]$"`
 	Age   int    `json:"age" validate:"min=1 max=7"`
 }
+
 
 func main() {
 	r := gin.Default()

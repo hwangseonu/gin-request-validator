@@ -8,6 +8,11 @@ import (
 
 var emailRegex = regexp.MustCompile(`^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$`)
 
+/*
+	구조체의 Field 가 email 임을 확인합니다.
+	아니면 error 를 반환합니다.
+	구조체 Field Tag 에 `validate: "email"`처럼 사용합니다.
+ */
 func EmailValidator(name string, i ...interface{}) error {
 	str, err := mustString(i[0])
 	if err != nil {
@@ -19,6 +24,11 @@ func EmailValidator(name string, i ...interface{}) error {
 	return nil
 }
 
+/*
+	구조체의 Field 가 최소 min 임을 확인합니다.
+	아니면 error 를 반환합니다.
+	구조체 Field Tag 에 `validate: "min=5"`처럼 사용합니다.
+ */
 func MinValidator(name string, i ...interface{}) error {
 	data, err := mustInt(i[0])
 	if err != nil {
@@ -34,6 +44,11 @@ func MinValidator(name string, i ...interface{}) error {
 	return nil
 }
 
+/*
+	구조체의 Field 가 최대 max 임을 확인합니다.
+	아니면 error 를 반환합니다.
+	구조체 Field Tag 에 `validate: "max=5"`처럼 사용합니다.
+ */
 func MaxValidator(name string, i ...interface{}) error {
 	data, err := mustInt(i[0])
 	if err != nil {
@@ -49,6 +64,11 @@ func MaxValidator(name string, i ...interface{}) error {
 	return nil
 }
 
+/*
+	구조체의 Field 가 정규식 pattern 과 일치함을 확인합니다.
+	아니면 error 를 반환합니다.
+	구조체 Field Tag 에 `validate: "pattern=^[A-Z]$"`처럼 사용합니다.
+ */
 func PatternValidator(name string, i ...interface{}) error {
 	var data, regexStr string
 	var err error
@@ -66,10 +86,15 @@ func PatternValidator(name string, i ...interface{}) error {
 	if r.MatchString(data) {
 		return nil
 	} else {
-		return errors.New(name + "is not matched pattern")
+		return errors.New(name + " is not matched pattern")
 	}
 }
 
+/*
+	구조체의 Field 가 문자열이고 비어있지 않음을 확인합니다.
+	아니면 error 를 반환합니다.
+	구조체 Field Tag 에 `validate: "notblank"`처럼 사용합니다.
+ */
 func NotBlackValidator(name string, i ...interface{}) error {
 	if str, err := mustString(i); err != nil {
 		return err

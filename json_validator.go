@@ -10,11 +10,6 @@ import (
 	"unicode"
 )
 
-type Validator struct {
-	Func      func(name string, interfaces ...interface{}) error
-	Arguments []string
-}
-
 var validators = map[string]Validator{
 	"email": {Func: EmailValidator, Arguments: []string{"string"}},
 	"min": {Func: MinValidator, Arguments: []string{"int", "int"}},
@@ -23,6 +18,19 @@ var validators = map[string]Validator{
 	"notblank": {Func: NotBlackValidator, Arguments: []string{"string"}},
 }
 
+/*
+	Validator 구조체는 validator 함수와 인자의 종류를 함께 묶어놓은 구조체입니다.
+	Custom Validator 를 등록하면 Validator 구조체의 인스턴스를 생성하여 등록합니다.
+ */
+type Validator struct {
+	Func      func(name string, interfaces ...interface{}) error
+	Arguments []string
+}
+
+/*
+	JsonRequiredMiddleware 는 구조체의 인스턴스를 인자로 받아 요청에서 json 데이터를 추출하여 매칭하고 유효성을 검사하여
+	문제가 있으면 400 을 반환하고 문제가 없으면 json 데이터를 context 에 저장합니다.
+ */
 func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		t := reflect.TypeOf(json)
@@ -43,6 +51,10 @@ func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
 	}
 }
 
+/*
+	GetJsonData 는 JsonRequiredMiddleware 가 context 에 저장한 json 데이터를 추출하여 반환합니다.
+	데이터가 없다면 nil 을 반환합니다.
+ */
 func GetJsonData(c *gin.Context) interface{} {
 	json, ok := c.Get("json")
 	if !ok {
@@ -51,6 +63,11 @@ func GetJsonData(c *gin.Context) interface{} {
 	return json
 }
 
+/*
+	ValidData 는 직접적으로 유효성을 검사하는 함수입니다.
+	json 으로 받은 데이터를 must 와 비교하여 유효성을 검사합니다.
+	문제가 없으면 nil 을, 문제가 있으면 error 를 반환합니다.
+ */
 func ValidData(json interface{}, must reflect.Type) error {
 	m, ok := json.(map[string]interface{})
 	if ok {
@@ -87,6 +104,20 @@ func ValidData(json interface{}, must reflect.Type) error {
 		}
 	}
 	return nil
+}
+
+/*
+	CustomValidator 를 등록합니다.
+	name 은 validator 의 이름을, f 는 구현된 validator 함수를, args 는 validator 함수에 필요한 인자들의 타입을 순서대로 적습니다.
+	args 의 제일 처음은 구조체 Field 의 타입입니다.
+	나머지 args 는 `validate: "in=A,B,C"` 일때 A, B, C 같은 인자를 의미합니다.
+ */
+func RegistValidator(name string, f func(name string, interfaces ...interface{}) error, args ...string) {
+	v := Validator{
+		Func: EmailValidator,
+		Arguments: args,
+	}
+	validators[name] = v
 }
 
 func getTrueType(i interface{}, must string) interface{} {
