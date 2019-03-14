@@ -4,7 +4,8 @@ middleware 형식으로 검사하여 결과를 함수로 받을 수 있습니다
 
 ## Usage
 JsonRequiredMiddleware 를 사용할 url 의 Group 에 미들웨어로 등록합니다.  
-만약 요청이 유효하지 않으면 상태코드 400를 반환하여 요청을 종료합니다.
+만약 요청이 유효하지 않으면 상태코드 400를 반환하여 요청을 종료합니다.  
+실패한 모든 유효성 검사의 error 를 슬라이스로 반환합니다.  
 ```go
 package main
     func main() {
@@ -27,7 +28,8 @@ func handler(c *gin.Context) {
 }
 ```
 직접적으로 유효성을 검사할 때는 ValidData 함수를 이용할 수 있습니다.  
-유효성을 검사하여 문제가 있으면 error를 반환하며 문제가 없다면 nil을 반환합니다.  
+유효성을 검사하여 문제가 있으면 실패한 모든 validator의 error를 슬라이스 형태로 반환하며 
+문제가 없다면 nil을 반환합니다.  
 ```go
 package main
 
@@ -46,6 +48,7 @@ func main() {
 }
 ```
 새로운 CustomValidator 함수를 등록하려면 RegisterValidator를 사용합니다.  
+Validator 함수는 ```func (name string, data interface{}, interfaces ...interface{})```입니다.
 ```go
 package main
 

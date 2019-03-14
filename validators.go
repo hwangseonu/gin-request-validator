@@ -32,10 +32,12 @@ type Validator struct {
 	json 으로 받은 데이터를 must 와 비교하여 유효성을 검사합니다.
 	문제가 없으면 nil 을, 문제가 있으면 error 를 반환합니다.
  */
-func ValidData(json interface{}, must reflect.Type) error {
+func ValidData(json interface{}, must reflect.Type) []error {
 	json = mapToStruct(json, must)
 	v := reflect.ValueOf(json)
 	t := reflect.TypeOf(json)
+
+	result := make([]error, 0)
 
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
@@ -49,11 +51,13 @@ func ValidData(json interface{}, must reflect.Type) error {
 			data := v.Field(i)
 			validator := validators[t[0]]
 			if data.Kind().String() != validator.Arguments[0] {
-				return errors.New(f.Name + " must " + validator.Arguments[0])
+				result = append(result, errors.New(f.Name + " must " + validator.Arguments[0]))
+				continue
 			}
 			if len(validator.Arguments) == 1 {
 				if err := validator.Func(f.Name, data.Interface()); err != nil {
-					return err
+					result = append(result, err)
+					continue
 				}
 			} else {
 				args := strings.Split(t[1], ",")
@@ -63,12 +67,13 @@ func ValidData(json interface{}, must reflect.Type) error {
 					as = append(as, k)
 				}
 				if err := validator.Func(f.Name, data.Interface(), as...); err != nil {
-					return err
+					result = append(result, err)
+					continue
 				}
 			}
 		}
 	}
-	return nil
+	return result
 }
 
 /*

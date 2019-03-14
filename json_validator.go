@@ -16,13 +16,17 @@ func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
 		t := reflect.TypeOf(json)
 		json = mapToStruct(json, t)
 		if err := c.ShouldBindJSON(&json); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		json = mapToStruct(json, t)
 		if err := ValidData(json, t); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			msg := make([]string, 0)
+			for _, e := range err {
+				msg = append(msg, e.Error())
+			}
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": msg})
 			return
 		}
 
