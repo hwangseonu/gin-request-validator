@@ -7,9 +7,9 @@ import (
 )
 
 func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
+	t := reflect.TypeOf(json)
+	must := reflect.New(t).Interface()
 	return func(c *gin.Context) {
-		t := reflect.TypeOf(json)
-		must := reflect.New(t).Interface()
 		if err := c.ShouldBindJSON(&json); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
