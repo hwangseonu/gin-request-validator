@@ -1,0 +1,25 @@
+package gin_validator
+
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"reflect"
+)
+
+func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		t := reflect.TypeOf(json)
+		must := reflect.New(t).Elem().Interface()
+		if err := c.ShouldBindJSON(&json); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+
+		if err := ValidData(json, &must); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+			return
+		}
+		t = reflect.TypeOf(must)
+		println(t.String())
+	}
+}
