@@ -6,7 +6,8 @@ import (
 )
 
 var validators = map[string]Validator{
-	"email": EmailValidator,
+	"email":    EmailValidator,
+	"notblank": NotBlankValidator,
 }
 
 /*
@@ -14,7 +15,7 @@ var validators = map[string]Validator{
 	name 은 구조체 필드의 이름입니다.
 	data 는 구조체 인스턴스 필드에 들어있는 데이터입니다.
 	args 는 콤마(,)로 구분되는 validate 태그의 인자들입니다.
- */
+*/
 type Validator func(name string, data interface{}, args ...string) error
 
 func ValidData(json interface{}, must interface{}) error {
@@ -38,7 +39,11 @@ func ValidData(json interface{}, must interface{}) error {
 			fieldData := structValue.Field(i).Interface()
 			validator := validators[name]
 
-			if err := validator(name, fieldData, args[1:]...); err != nil {
+			if validator == nil {
+				continue
+			}
+
+			if err := validator(field.Name, fieldData, args[1:]...); err != nil {
 				return err
 			}
 		}

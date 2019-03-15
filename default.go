@@ -17,3 +17,12 @@ func EmailValidator(name string, data interface{}, args ...string) error {
 	return nil
 }
 
+func NotBlankValidator(name string, data interface{}, args ...string) error {
+	if str, err := mustString(data); err != nil {
+		return err
+	} else if str == "" {
+		return errors.New(name + " should not blank")
+	} else {
+		return nil
+	}
+}
