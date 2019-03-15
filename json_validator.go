@@ -9,14 +9,13 @@ import (
 func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
 	t := reflect.TypeOf(json)
 	return func(c *gin.Context) {
-		s := reflect.New(t).Elem().Interface()
-		if err := c.ShouldBindJSON(&s); err != nil {
+		var m map[string]interface{}
+		if err := c.ShouldBindJSON(&m); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-
-		tmp := reflect.New(reflect.TypeOf(json)).Interface()
-		if err := ValidData(s, tmp); err != nil {
+		tmp := reflect.New(t).Interface()
+		if err := ValidData(m, tmp); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}

@@ -1,6 +1,7 @@
 package gin_validator
 
 import (
+	"errors"
 	"reflect"
 	"strings"
 )
@@ -18,7 +19,7 @@ var validators = map[string]Validator{
 */
 type Validator func(name string, data interface{}, args ...string) error
 
-func ValidData(json interface{}, must interface{}) error {
+func ValidData(json map[string]interface{}, must interface{}) error {
 	if err := mapToStruct(json, must); err != nil {
 		return err
 	}
@@ -32,17 +33,21 @@ func ValidData(json interface{}, must interface{}) error {
 		if validateTag == "" {
 			continue
 		}
-		tags := strings.Split(validateTag, " ")
-		for _, tag := range tags {
+		isRequired, v := checkRequired(json, must, field.Name)
+		if isRequired && v == nil {
+			return errors.New(field.Name + " is required field")
+		} else if !isRequired && v == nil {
+			continue
+		}
+
+		for _, tag := range strings.Split(validateTag, " ") {
 			args := strings.Split(tag, "=")
 			name := args[0]
 			fieldData := structValue.Field(i).Interface()
 			validator := validators[name]
-
 			if validator == nil {
 				continue
 			}
-
 			if err := validator(field.Name, fieldData, args[1:]...); err != nil {
 				return err
 			}
