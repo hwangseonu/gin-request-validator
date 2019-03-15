@@ -4,12 +4,13 @@ gin-validator는 gin에서 request body의 유효성을 검사하는 라이브�
 
 ## Usage
 
-구조체를 정의할 때 각 필드에 validate태그를 이용하여 유효성 검사에 대한 정보를 기입합니다.
+구조체를 정의할 때 각 필드에 validate태그를 이용하여 유효성 검사에 대한 정보를 기입합니다.  
+binding 태그를 이용하여 꼭 필요한 필드를 나타낼 수 있습니다.
 ```go
 package main
 
 type Data struct {
-	Email string `json:"email" validate:"email"`
+	Email string `json:"email" validate:"email" binding:"required"`
 	Age   int    `json:"age" validate:"min=1 max=100"`
 }
 ```
@@ -18,6 +19,11 @@ JsonRequiredMiddleware를 url의 미들웨어로 등록하여 유효성검사를
 만약 요청이 유효하지 않으면 상태코드 400을 반환하며 요청을 종료합니다.
 ```go
 package main
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/hwangseonu/gin-request-validator"
+)
 
 func main() {
 	e := gin.Default()
@@ -32,6 +38,12 @@ func main() {
 유효성 검사를 통과한 데이터는 Handler에서 GetJsonData함수를 통해 얻을 수 있습니다.
 ```go
 package main
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/hwangseonu/gin-request-validator"
+	"net/http"
+)
 
 func Handler(c *gin.Context) {
 	req := gin_validator.GetJsonData(c).(Data)
