@@ -11,6 +11,7 @@ var validators = map[string]Validator{
 	"notblank": NotBlankValidator,
 	"min": MinValidator,
 	"max": MaxValidator,
+	"pattern": PatternValidator,
 }
 
 /*

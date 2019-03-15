@@ -57,3 +57,22 @@ func MaxValidator(name string, data interface{}, args ...string) error {
 	}
 }
 
+func PatternValidator(name string, data interface{}, args ...string) error {
+	var str string
+	var err error
+	var r *regexp.Regexp
+
+	if str, err = mustString(data); err != nil {
+		return err
+	}
+
+	if r, err = regexp.Compile(args[0]); err != nil {
+		return err
+	}
+
+	if !r.MatchString(str) {
+		return errors.New(str + "not matched pattern")
+	} else {
+		return nil
+	}
+}
