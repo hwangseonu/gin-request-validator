@@ -14,42 +14,39 @@ func mustString(i interface{}) (string, error) {
 	}
 }
 
-func mapToStruct(i interface{}, s interface{}) error {
-	m, ok := i.(map[string]interface{})
-	if !ok {
-		return nil
-	}
+func mapToStruct(m map[string]interface{}, s interface{}) error {
 	for k, v := range m {
 		k = strings.ToUpper(string(rune(k[0]))) + k[1:]
-		err := setField(s, k, v)
-		if err != nil {
+		if err := setField(s, k, v); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func checkRequired(m map[string]interface{}, obj interface{}, name string) (bool, interface{}) {
-	structType := reflect.TypeOf(obj).Elem()
-	field, ok := structType.FieldByName(name)
+func checkRequiredField(m map[string]interface{}, obj interface{}, name string) (bool, interface{}) {
+	t := reflect.TypeOf(obj).Elem()
+	field, ok := t.FieldByName(name)
 	if !ok {
 		return false, errors.New("cannot find field by name " + name)
 	}
-
-	for k, v := range m {
-		if field.Name == k {
-			binding := field.Tag.Get("binding")
-			for _, tag := range strings.Split(binding, " ") {
-				if binding == "" {
-					return false, v
+	for _, c := range strings.Split(field.Tag.Get("binding"), " ") {
+		if c == "required" {
+			for k, v := range m {
+				k = strings.ToUpper(string(k[0])) + k[1:]
+				if field.Name == k {
+					return true, v
 				}
-				if tag == "required" {
-					k = strings.ToUpper(string(rune(k[0]))) + k[1:]
-
-				} else {
+			}
+			return true, nil
+		} else {
+			for k, v := range m {
+				k = strings.ToUpper(string(k[0])) + k[1:]
+				if field.Name == k {
 					return false, v
 				}
 			}
+			return false, nil
 		}
 	}
 	return false, nil

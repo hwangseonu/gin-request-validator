@@ -7,20 +7,19 @@ import (
 )
 
 func JsonRequiredMiddleware(json interface{}) gin.HandlerFunc {
-	t := reflect.TypeOf(json)
+	mustType := reflect.TypeOf(json)
 	return func(c *gin.Context) {
-		var m map[string]interface{}
+		m := make(map[string]interface{})
 		if err := c.ShouldBindJSON(&m); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		tmp := reflect.New(t).Interface()
-		if err := ValidData(m, tmp); err != nil {
+		must := reflect.New(mustType).Interface()
+		if err := ValidData(m, must); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-
-		c.Set("json", reflect.ValueOf(tmp).Elem().Interface())
+		c.Set("json", reflect.ValueOf(must).Elem().Interface())
 		c.Next()
 	}
 }

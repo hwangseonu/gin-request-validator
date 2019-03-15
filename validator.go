@@ -24,7 +24,6 @@ func ValidData(json map[string]interface{}, must interface{}) error {
 		return err
 	}
 	data := reflect.ValueOf(must).Elem().Interface()
-	structValue := reflect.ValueOf(data)
 	structType := reflect.TypeOf(data)
 
 	for i := 0; i < structType.NumField(); i++ {
@@ -33,22 +32,20 @@ func ValidData(json map[string]interface{}, must interface{}) error {
 		if validateTag == "" {
 			continue
 		}
-		isRequired, v := checkRequired(json, must, field.Name)
-		if isRequired && v == nil {
+		isRequired, data := checkRequiredField(json, must, field.Name)
+		if isRequired && data == nil {
 			return errors.New(field.Name + " is required field")
-		} else if !isRequired && v == nil {
+		} else if !isRequired && data == nil {
 			continue
 		}
 
-		for _, tag := range strings.Split(validateTag, " ") {
-			args := strings.Split(tag, "=")
-			name := args[0]
-			fieldData := structValue.Field(i).Interface()
-			validator := validators[name]
+		for _, c := range strings.Split(validateTag, " ") {
+			args := strings.Split(c, "=")
+			validator := validators[args[0]]
 			if validator == nil {
 				continue
 			}
-			if err := validator(field.Name, fieldData, args[1:]...); err != nil {
+			if err := validator(field.Name, data, args[1:]...); err != nil {
 				return err
 			}
 		}
