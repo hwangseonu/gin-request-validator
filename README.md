@@ -24,7 +24,7 @@ func main() {
 	g := e.Group("/awesome")
 
 	//인자값으로 정의된 구조체의 빈 인스턴스를 넘겨줍니다
-	g.Use(JsonRequiredMiddleware(Data{}))
+	g.Use(gin_validator.JsonRequiredMiddleware(Data{}))
 	...
 }
 ```
@@ -35,6 +35,6 @@ package main
 
 func Handler(c *gin.Context) {
 	req := gin_validator.GetJsonData(c).(Data)
-	c.JSON(http.StatusOk, req)
+	c.JSON(http.StatusOK, req)
 }
 ```

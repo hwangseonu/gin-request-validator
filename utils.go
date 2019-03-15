@@ -10,8 +10,26 @@ func mustString(i interface{}) (string, error) {
 	if s, ok := i.(string); ok {
 		return s, nil
 	} else {
-		return "", errors.New("interface is not string")
+		return "", errors.New(" is must int")
 	}
+}
+
+func mustInt(i interface{}) (int, error) {
+	if reflect.TypeOf(i).Kind() == reflect.Float64 {
+		f := i.(float64)
+		d := int(f)
+		return d, nil
+	} else {
+		if d, ok := i.(int); ok {
+			return d, nil
+		} else {
+			return 0, errors.New(" is must int")
+		}
+	}
+}
+
+func toInt(str string) {
+
 }
 
 func mapToStruct(m map[string]interface{}, s interface{}) error {
@@ -64,6 +82,12 @@ func setField(obj interface{}, name string, value interface{}) error {
 	}
 
 	val := reflect.ValueOf(value)
+
+	if fieldVal.Type().Kind() == reflect.Int && val.Type().Kind() == reflect.Float64{
+		f := val.Interface().(float64)
+		i := int(f)
+		val = reflect.ValueOf(i)
+	}
 
 	if fieldVal.Type() != val.Type() {
 		if m, ok := value.(map[string]interface{}); ok {

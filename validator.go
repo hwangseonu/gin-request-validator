@@ -9,6 +9,8 @@ import (
 var validators = map[string]Validator{
 	"email":    EmailValidator,
 	"notblank": NotBlankValidator,
+	"min": MinValidator,
+	"max": MaxValidator,
 }
 
 /*
