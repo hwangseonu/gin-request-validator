@@ -74,7 +74,7 @@ func setField(obj interface{}, name string, value interface{}) error {
 	fieldVal := structValue.FieldByName(name)
 
 	if !fieldVal.IsValid() {
-		return errors.New("no such field: " + name + " in object")
+		return nil
 	}
 	if !fieldVal.CanSet() {
 		return errors.New("cannot set " + name + " field value")
