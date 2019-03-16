@@ -28,10 +28,7 @@ func mustInt(i interface{}) (int, error) {
 	}
 }
 
-func toInt(str string) {
-
-}
-
+//map 을 인자로 받은 구조체로 변환합니다.
 func mapToStruct(m map[string]interface{}, s interface{}) error {
 	for k, v := range m {
 		k = strings.ToUpper(string(rune(k[0]))) + k[1:]
@@ -42,6 +39,8 @@ func mapToStruct(m map[string]interface{}, s interface{}) error {
 	return nil
 }
 
+//반드시 있어야하는 구조체 필드를 확인합니다.
+//Required 여부와 구조체 필드의 데이터를 반환합니다.
 func checkRequiredField(m map[string]interface{}, obj interface{}, name string) (bool, interface{}) {
 	t := reflect.TypeOf(obj).Elem()
 	field, ok := t.FieldByName(name)
