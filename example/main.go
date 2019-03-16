@@ -9,6 +9,8 @@ import (
 //유효성을 검사할 구조체를 정의합니다.
 //binding 태그를 이용하여 꼭 필요한 필드를 나타낼 수 있습니다.
 type Data struct {
+	Name string `json:"name" validate:"pattern=^[A-Z]{3}$" binding:"required"`
+	Nickname string `json:"nickname" validate:"notblank" binding:"required"`
 	Email string `json:"email" validate:"email" binding:"required"`
 	Age   int    `json:"age" validate:"min=1 max=100"`
 }

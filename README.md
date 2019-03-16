@@ -50,3 +50,21 @@ func Handler(c *gin.Context) {
 	c.JSON(http.StatusOK, req)
 }
 ```
+
+## 제공되는 validator
+
+- min : 구조체 필드가 최소값보다 크거나 같은지 확인합니다. (ex: validate:"min=1")
+- max : 구조체 필드가 최대값보다 작거나 같은지 확인합니다. (ex: validate:"max=100")
+- email : 구조체 필드가 이메일 형식을 지키는지 확인합니다. (ex: validate:"email")
+- notblank : 구조체 필드가 비어있지 않는지 확인합니다. (ex: validate:"notblank")
+- pattern : 구조체 필드가 이메일 형식을 지키는지 확인합니다. (ex: validate:"pattern=^[A-Z]{3}$")
+
+### 예시
+```go
+type Data struct {
+	Name string `json:"name" validate:"pattern=^[A-Z]{3}$" binding:"required"`
+	Nickname string `json:"nickname" validate:"notblank" binding:"required"`
+	Email string `json:"email" validate:"email" binding:"required"`
+	Age   int    `json:"age" validate:"min=1 max=100"`
+}
+```
