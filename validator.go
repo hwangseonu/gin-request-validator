@@ -1,3 +1,5 @@
+//gin_validator 는 gin 의 request body 의 유효성을 구조체의 정의를 통해 검사하는 라이브러리입니다.
+//Handler 에 불필요한 구조체의 유효성을 검사하는 코드가 포함되는 것을 막기 위해 만들었습니다.
 package gin_validator
 
 import (
