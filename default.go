@@ -44,7 +44,7 @@ func MinValidator(name string, data interface{}, args ...string) error {
 	} else {
 		if min, err := strconv.Atoi(args[0]); err != nil {
 			return errors.New("first argument of min validate must int")
-		} else if min < i {
+		} else if min > i {
 			return errors.New(name + " must greater than " + strconv.Itoa(min))
 		} else {
 			return nil
