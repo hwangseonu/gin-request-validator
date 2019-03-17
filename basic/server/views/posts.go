@@ -6,6 +6,7 @@ import (
 	"github.com/hwangseonu/gin-restful-example/basic/server/models"
 	"github.com/hwangseonu/gin-restful-example/basic/server/security"
 	"net/http"
+	"time"
 )
 
 type Posts struct {
@@ -49,6 +50,7 @@ func (r Posts) Patch(c *gin.Context, id int, req CreatePostRequest) (gin.H, int)
 	}
 	p.Title = req.Title
 	p.Content = req.Content
+	p.UpdateAt = time.Now()
 	return PostResponse(p), http.StatusOK
 }
 

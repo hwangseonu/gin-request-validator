@@ -7,6 +7,7 @@ import (
 	"github.com/hwangseonu/gin-restful-example/basic/server/security"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Comments struct {
@@ -46,6 +47,7 @@ func (r Comments) Patch(c *gin.Context, cid int, req CommentRequest) (gin.H, int
 				return gin.H{"message": "cannot access this resource"}, http.StatusForbidden
 			}
 			comment.Content = req.Content
+			comment.UpdateAt = time.Now()
 			return PostResponse(p), http.StatusCreated
 		}
 	}
