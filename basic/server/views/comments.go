@@ -25,28 +25,20 @@ func InitCommentsResource() Comments {
 
 func (r Comments) Post(c *gin.Context, req CommentRequest) (gin.H, int) {
 	u := c.MustGet("user").(*models.UserModel)
-	if pid, err := getPostId(c); err != nil {
-		return gin.H{"message": err.Error()}, http.StatusBadRequest
+	if p, err := getPost(c); err != nil {
+		return gin.H{"message": err.Message}, err.Status
 	} else {
-		p := models.FindPostById(pid)
-		if p == nil {
-			return gin.H{"message": "cannot find post by id"}, http.StatusNotFound
-		}
-		c := models.NewComment(req.Content, u)
-		p.AddComment(c)
+		comment := models.NewComment(req.Content, u)
+		p.AddComment(comment)
 		return PostResponse(p), http.StatusCreated
 	}
 }
 
 func (r Comments) Patch(c *gin.Context, cid int, req CommentRequest) (gin.H, int) {
 	u := c.MustGet("user").(*models.UserModel)
-	if pid, err := getPostId(c); err != nil {
-		return gin.H{"message": err.Error()}, http.StatusBadRequest
+	if p, err := getPost(c); err != nil {
+		return gin.H{"message": err.Message}, err.Status
 	} else {
-		p := models.FindPostById(pid)
-		if p == nil {
-			return gin.H{"message": "cannot find post by id"}, http.StatusNotFound
-		}
 		if comment := p.FindComment(cid); comment == nil {
 			return gin.H{"message": err.Error()}, http.StatusBadRequest
 		} else {
@@ -61,13 +53,9 @@ func (r Comments) Patch(c *gin.Context, cid int, req CommentRequest) (gin.H, int
 
 func (r Comments) Delete(c *gin.Context, cid int) (gin.H, int) {
 	u := c.MustGet("user").(*models.UserModel)
-	if pid, err := getPostId(c); err != nil {
-		return gin.H{"message": err.Error()}, http.StatusBadRequest
+	if p, err := getPost(c); err != nil {
+		return gin.H{"message": err.Message}, err.Status
 	} else {
-		p := models.FindPostById(pid)
-		if p == nil {
-			return gin.H{"message": "cannot find post by id"}, http.StatusNotFound
-		}
 		if comment := p.FindComment(cid); comment == nil {
 			return gin.H{"message": err.Error()}, http.StatusNotFound
 		} else {
@@ -82,7 +70,22 @@ func (r Comments) Delete(c *gin.Context, cid int) (gin.H, int) {
 	}
 }
 
-func getPostId(c *gin.Context) (int, error) {
-	pid := c.Param("pid")
-	return strconv.Atoi(pid)
+func getPost(c *gin.Context) (*models.PostModel, *gin_restful.ApplicationError) {
+	str := c.Param("pid")
+	if pid, err := strconv.Atoi(str); err != nil {
+		return nil, &gin_restful.ApplicationError{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest,
+		}
+	} else {
+		p := models.FindPostById(pid)
+		if p == nil {
+			return nil, &gin_restful.ApplicationError{
+				Message: "cannot find post by id",
+				Status:  http.StatusNotFound,
+			}
+		} else {
+			return p, nil
+		}
+	}
 }
