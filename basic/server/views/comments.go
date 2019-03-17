@@ -47,7 +47,7 @@ func (r Comments) Patch(c *gin.Context, cid int, req CommentRequest) (gin.H, int
 		if p == nil {
 			return gin.H{"message": "cannot find post by id"}, http.StatusNotFound
 		}
-		if comment := p.FindComment(cid); c == nil {
+		if comment := p.FindComment(cid); comment == nil {
 			return gin.H{"message": err.Error()}, http.StatusBadRequest
 		} else {
 			if comment.Id != u.Id {
@@ -55,6 +55,29 @@ func (r Comments) Patch(c *gin.Context, cid int, req CommentRequest) (gin.H, int
 			}
 			comment.Content = req.Content
 			return PostResponse(p), http.StatusCreated
+		}
+	}
+}
+
+func (r Comments) Delete(c *gin.Context, cid int) (gin.H, int) {
+	u := c.MustGet("user").(*models.UserModel)
+	if pid, err := getPostId(c); err != nil {
+		return gin.H{"message": err.Error()}, http.StatusBadRequest
+	} else {
+		p := models.FindPostById(pid)
+		if p == nil {
+			return gin.H{"message": "cannot find post by id"}, http.StatusNotFound
+		}
+		if comment := p.FindComment(cid); comment == nil {
+			return gin.H{"message": err.Error()}, http.StatusNotFound
+		} else {
+			if comment.Id != u.Id {
+				return gin.H{"message": "cannot access this resource"}, http.StatusForbidden
+			}
+			if ok := p.RemoveComment(comment.Id); !ok {
+				return gin.H{"message": "cannot find comment by id"}, http.StatusNotFound
+			}
+			return PostResponse(p), http.StatusOK
 		}
 	}
 }
