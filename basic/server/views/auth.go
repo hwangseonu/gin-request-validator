@@ -47,6 +47,7 @@ type Refresh struct {
 
 func InitRefreshResource() Refresh {
 	r := Refresh{gin_restful.InitResource()}
+	r.AddMiddleware(security.AuthRequired(security.REFRESH))
 	return r
 }
 
