@@ -27,11 +27,7 @@ func InitUsersResource() Users {
 
 func (r Users) Get(c *gin.Context) (gin.H, int) {
 	u := c.MustGet("user").(*models.UserModel)
-	return gin.H{
-		"username": u.Username,
-		"nickname": u.Nickname,
-		"email": u.Email,
-	}, http.StatusOK
+	return UserResponse(u), http.StatusOK
 }
 
 func (r Users) Post(req SignUpRequest) (gin.H, int) {
@@ -40,9 +36,5 @@ func (r Users) Post(req SignUpRequest) (gin.H, int) {
 	}
 	u := models.NewUserModel(req.Username, req.Password, req.Nickname, req.Email, "ROLE_USER")
 	u.Save()
-	return gin.H{
-		"username": u.Username,
-		"nickname": u.Nickname,
-		"email": u.Email,
-	}, http.StatusCreated
+	return UserResponse(u), http.StatusCreated
 }

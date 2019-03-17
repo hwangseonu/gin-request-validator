@@ -33,10 +33,7 @@ func (r Auth) Post(req SignInRequest) (gin.H, int) {
 	}
 	access := security.GenerateToken(security.ACCESS, u.Username)
 	refresh := security.GenerateToken(security.REFRESH, u.Username)
-	return gin.H{
-		"access":  access,
-		"refresh": refresh,
-	}, http.StatusOK
+	return AuthResponse(access, refresh), http.StatusOK
 }
 
 const DAY = 24 * time.Hour
@@ -59,8 +56,8 @@ func (r Refresh) Get(c *gin.Context) (gin.H, int) {
 	refresh := security.GenerateToken(security.REFRESH, u.Username)
 
 	if time.Unix(exp, 0).Before(time.Now().Add(7 * DAY)) {
-		return gin.H{"access": access, "refresh": refresh}, http.StatusOK
+		return AuthResponse(access, refresh), http.StatusOK
 	} else {
-		return gin.H{"access": access}, http.StatusOK
+		return AuthResponse(access, ""), http.StatusOK
 	}
 }

@@ -28,56 +28,12 @@ func (r Posts) Get(id int) (gin.H, int) {
 	if p == nil {
 		return gin.H{"message": "cannot find post by id"}, http.StatusNotFound
 	}
-	return createPostResponse(p), http.StatusOK
+	return PostResponse(p), http.StatusOK
 }
 
 func (r Posts) Post(c *gin.Context, req CreatePostRequest) (gin.H, int) {
 	user := c.MustGet("user").(*models.UserModel)
 	p := models.NewPost(req.Title, req.Content, user)
 	p.Save()
-	return createPostResponse(p), http.StatusCreated
-}
-
-func createPostResponse(p *models.PostModel) gin.H {
-	u := models.FindUserById(p.Writer)
-	writer := gin.H{}
-	if u != nil {
-		writer = gin.H{
-			"username": u.Username,
-			"nickname": u.Nickname,
-			"email":    u.Email,
-		}
-	}
-	return gin.H{
-		"id":        p.Id,
-		"title":     p.Title,
-		"content":   p.Content,
-		"comments":  createCommentsResponse(p.Comments),
-		"writer":    writer,
-		"create_at": p.CreateAt,
-		"update_at": p.UpdateAt,
-	}
-}
-
-func createCommentsResponse(c []*models.CommentModel) []gin.H {
-	result := make([]gin.H, 0)
-	for _, v := range c {
-		u := models.FindUserById(v.Writer)
-		writer := gin.H{}
-		if u != nil {
-			writer = gin.H{
-				"username": u.Username,
-				"nickname": u.Nickname,
-				"email":    u.Email,
-			}
-		}
-		result = append(result, gin.H{
-			"id":        v.Id,
-			"content":   v.Content,
-			"writer":    writer,
-			"create_at": v.CreateAt,
-			"update_at": v.UpdateAt,
-		})
-	}
-	return result
+	return PostResponse(p), http.StatusCreated
 }
