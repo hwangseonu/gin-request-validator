@@ -1,7 +1,5 @@
 package models
 
-import "github.com/gin-gonic/gin"
-
 type UserModel struct {
 	Id       int      `json:"id"`
 	Username string   `json:"username"`
@@ -60,10 +58,6 @@ func ExistsUserByUsernameOrNicknameOrEmail(username, nickname, email string) boo
 	return false
 }
 
-func GetAccounts() gin.Accounts {
-	accounts := make(map[string]string)
-	for _, u := range users {
-		accounts[u.Username] = u.Password
-	}
-	return accounts
+func DeleteUserById(id int) {
+	delete(users, id)
 }
