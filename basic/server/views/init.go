@@ -17,7 +17,7 @@ func RegisterViews(e *gin.Engine) {
 	api.AddResource(auth, "/auth")
 	api.AddResource(refresh, "/auth/refresh")
 	api.AddResource(posts, "/posts")
-	api.AddResource(comments, "/posts/:pid/comments")
+	api.AddResource(comments, "/comments/:pid")
 }
 
 func UserResponse(u *models.UserModel) gin.H {

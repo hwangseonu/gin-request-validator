@@ -38,6 +38,20 @@ func (p *PostModel) RemoveComment(id int) bool {
 	return false
 }
 
+func (p *PostModel) FindComment(id int) *CommentModel {
+	for _, c := range p.Comments {
+		if c.Id == id {
+			if !ExistsUserById(c.Writer) {
+				p.RemoveComment(c.Id)
+				return nil
+			} else {
+				return c
+			}
+		}
+	}
+	return nil
+}
+
 func NewPost(title, content string, writer *UserModel) *PostModel {
 	return &PostModel{
 		Id:       GetNextId("posts"),

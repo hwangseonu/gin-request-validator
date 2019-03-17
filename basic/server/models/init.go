@@ -13,7 +13,8 @@ func init() {
 func GetNextId(name string) int {
 	i, ok := autoIncrement[name]
 	if ok {
-		return i
+		autoIncrement[name]++
+		return i+1
 	} else {
 		autoIncrement[name] = 0
 		return 0

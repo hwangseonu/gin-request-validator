@@ -49,7 +49,6 @@ func (r Posts) Patch(c *gin.Context, id int, req CreatePostRequest) (gin.H, int)
 	}
 	p.Title = req.Title
 	p.Content = req.Content
-	p.Save()
 	return PostResponse(p), http.StatusOK
 }
 
