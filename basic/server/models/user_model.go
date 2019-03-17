@@ -27,7 +27,11 @@ func NewUserModel(username, password, nickname, email string, roles ...string) *
 }
 
 func FindUserById(id int) *UserModel {
-	return users[id]
+	u, ok := users[id]
+	if !ok {
+		return nil
+	}
+	return u
 }
 
 func FindUserByUsername(username string) *UserModel {
@@ -41,6 +45,10 @@ func FindUserByUsername(username string) *UserModel {
 
 func ExistsUserByUsername(username string) bool {
 	return FindUserByUsername(username) != nil
+}
+
+func ExistsUserById(id int) bool {
+	return FindUserById(id) != nil
 }
 
 func ExistsUserByUsernameOrNicknameOrEmail(username, nickname, email string) bool {
