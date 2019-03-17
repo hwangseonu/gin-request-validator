@@ -19,7 +19,7 @@ type CreatePostRequest struct {
 
 func InitPostsResource() Posts {
 	r := Posts{gin_restful.InitResource()}
-	r.AddMiddleware(security.AuthRequired(security.ACCESS), http.MethodPost)
+	r.AddMiddleware(security.AuthRequired(security.ACCESS), http.MethodPost, http.MethodPatch, http.MethodDelete)
 	return r
 }
 
