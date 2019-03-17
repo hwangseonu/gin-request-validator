@@ -61,6 +61,7 @@ func AuthRequired(sub string, roles ...string) gin.HandlerFunc {
 		tokenString := strings.Replace(c.GetHeader("Authorization"), "Bearer ", "", 1)
 		if tokenString == "" {
 			c.AbortWithStatus(http.StatusUnauthorized)
+			return
 		}
 		var token *jwt.Token
 		var err error

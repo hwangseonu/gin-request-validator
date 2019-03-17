@@ -9,11 +9,13 @@ import (
 func RegisterViews(e *gin.Engine) {
 	users := InitUsersResource()
 	auth := InitAuthResource()
+	refresh := InitRefreshResource()
 	posts := InitPostsResource()
 	comments := InitCommentsResource()
 	api := gin_restful.NewApi(e, "/")
 	api.AddResource(users, "/users")
 	api.AddResource(auth, "/auth")
+	api.AddResource(refresh, "/auth/refresh")
 	api.AddResource(posts, "/posts")
 	api.AddResource(comments, "/posts/:pid/comments")
 }
