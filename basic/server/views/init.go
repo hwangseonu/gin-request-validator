@@ -7,6 +7,8 @@ import (
 
 func RegisterViews(e *gin.Engine) {
 	users := InitUsersResource()
+	auth := InitAuthResource()
 	api := gin_restful.NewApi(e, "/")
 	api.AddResource(users, "/users")
+	api.AddResource(auth, "/auth")
 }

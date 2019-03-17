@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hwangseonu/gin-restful"
 	"github.com/hwangseonu/gin-restful-example/basic/server/models"
+	"github.com/hwangseonu/gin-restful-example/basic/server/security"
 	"net/http"
 )
 
@@ -11,26 +12,37 @@ type Users struct {
 	*gin_restful.Resource
 }
 
-type CreateUserRequest struct {
+type SignUpRequest struct {
 	Username string `json:"username" binding:"required,notblank"`
 	Password string `json:"password" binding:"required,notblank"`
+	Nickname string `json:"nickname" binding:"required,notblank"`
+	Email    string `json:"email" binding:"required,notblank,email"`
 }
 
 func InitUsersResource() Users {
 	r := Users{Resource: gin_restful.InitResource()}
+	r.AddMiddleware(security.AuthRequired(security.ACCESS, "ROLE_USER"), http.MethodGet)
 	return r
 }
 
-func (r Users) Post(req CreateUserRequest) (gin.H, int) {
-	if models.ExistsUserByUsername(req.Username) {
+func (r Users) Get(c *gin.Context) (gin.H, int) {
+	u := c.MustGet("user").(*models.UserModel)
+	return gin.H{
+		"username": u.Username,
+		"nickname": u.Nickname,
+		"email": u.Email,
+	}, http.StatusOK
+}
+
+func (r Users) Post(req SignUpRequest) (gin.H, int) {
+	if models.ExistsUserByUsernameOrNicknameOrEmail(req.Username, req.Nickname, req.Email) {
 		return gin.H{}, http.StatusConflict
 	}
-	u := models.NewUserModel(req.Username, req.Password)
+	u := models.NewUserModel(req.Username, req.Password, req.Nickname, req.Email, "ROLE_USER")
 	u.Save()
 	return gin.H{
 		"username": u.Username,
-		"password": u.Password,
+		"nickname": u.Nickname,
+		"email": u.Email,
 	}, http.StatusCreated
 }
-
-

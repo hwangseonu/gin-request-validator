@@ -3,6 +3,7 @@ module github.com/hwangseonu/gin-restful-example/basic
 go 1.12
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.3.0
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/hwangseonu/gin-restful v0.0.0-20190316142946-6469308ed5a0
